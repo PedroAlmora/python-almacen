@@ -1,0 +1,48 @@
+{% extends 'dashboard.html' %} {% block content %} {% if messages %}
+<div class="alert-container">
+  {% for message in messages %}
+  <div
+    class="alert alert-{{ message.tags }} alert-dismissible fade show"
+    role="alert"
+  >
+    {{ message }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+<div class="card shadow mb-4">
+  <div class="card-header py-3 d-flex justify-content-between">
+    <h6 class="m-0 font-weight-bold text-primary">Estante: {{estante.nombre}}</h6>
+    {% if user.is_superuser or user.rol == 'almacenero' %}
+    <div style="display: flex;">
+    <a href={% url 'almacen_app:edit_estante' estante_id=estante.id %} class="btn btn-primary" style="margin-right: 10px">
+        <i class="fas fa-pencil-alt"></i> <span class="ml-1">EDITAR</span>
+    </a>
+    <form  method="POST" action="{% url 'almacen_app:delete_estante' estante_id=estante.id %}" id="delete-estante-form-{{ estante.id }}">
+      {% csrf_token %}
+      <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteEstanteModal" onclick="setDeleteEstanteId({{ estante.id }})">
+        <i class="fas fa-trash-alt"></i> <span class="ml-1">ELIMINAR</span>
+      </a>
+    </form>
+  </div>
+    {% endif %}
+</div>
+  <div class="card-body">
+    <div class="container">
+      <div class="row">
+          <h5 class="m-0 font-weight-bold text-danger">Productos:</h5>
+          <ul>
+            {% for producto in estante.productos.all %}
+            <li>{{ producto.codigo }}</li>
+            {% empty %}
+            <li>No hay productos en este Estante.</li>
+            {% endfor %}
+          </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

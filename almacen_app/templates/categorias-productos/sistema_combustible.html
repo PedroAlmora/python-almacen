@@ -1,0 +1,67 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Sistema de Combustible</h6>
+        
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Número de artículo</th>
+                        <th>Producto</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for sistema_combustible in sistema_combustible %}
+                    <tr>
+                        <td style="width: 100px">
+                            {% if sistema_combustible.imagen %}
+                              <img src="{{ sistema_combustible.imagen.url }}" alt="{{ sistema_combustible.descripcion }}" style="max-width: 100%; height: auto; display: block;">
+                            {% else %}
+                              <img src="{% static 'img/tmp_img.png' %}" alt="Imagen por defecto" style="max-width: 100%; height: auto; display: block;">
+                            {% endif %}
+                          </td>
+                        <td>{{sistema_combustible.codigo}}</td>
+                        <td>{{sistema_combustible.nombre}}</td>
+                        <td>{{sistema_combustible.descripcion |truncatewords:1}}</td>
+                        <td>{{sistema_combustible.precio}}</td>
+                        <td>{{sistema_combustible.cantidad}}</td>
+                        <td width="200px">
+                            <form action="{% url 'almacen_app:delete_producto' product_id=sistema_combustible.id %}" method="POST" id="delete-producto-form-{{ sistema_combustible.id }}">
+                                {% csrf_token %}
+                                    
+                                {% if user.is_superuser or user.rol == 'almacenero' %}
+                                    <a class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="right"
+                                    title="Editar Producto" href={% url 'almacen_app:edit_producto' product_id=sistema_combustible.id %}><i class="fa fa-edit" ></i></a> 
+    
+                                    <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteProductoModal" onclick="setDeleteProductoId({{ sistema_combustible.id }})">
+                                        <i class="fa fa-trash-alt"></i>
+                                    </a>
+                                    {% endif %}
+
+                                    <a class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="right"
+                                    title="Detalles" href="{% url 'almacen_app:detalle_producto' producto_id=sistema_combustible.id %}"><i class="fa fa-eye" ></i></a>
+                                    
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %} 
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

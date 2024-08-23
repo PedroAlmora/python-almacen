@@ -1,0 +1,69 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load i18n %}
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <h4>{% if editar %}Actualizar{% else %}Registrar{% endif %} Usuario</h4>
+    </div>
+</div>
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="container mt-5">
+            <form method="post" class="row g-3" id="userForm">
+                {% csrf_token %}
+                <div class="col-md-6 d-flex flex-column align-items-start">
+                    <div class="mb-4">
+                        <label for="{{ form.username.id_for_label }}">Nombre de usuario:</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.first_name.id_for_label }}">Nombre:</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.last_name.id_for_label }}">Apellido:</label>
+                        {{ form.last_name }}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.email.id_for_label }}">Correo electrónico:</label>
+                        {{ form.email }}
+                    </div>
+                </div>
+                <div class="col-md-6 d-flex flex-column align-items-start">
+                    <div class="mb-4">
+                        <label for="{{ form.password1.id_for_label }}">Contraseña:</label>
+                        {{ form.password1 }}
+                        <small class="form-text text-muted">
+                            La contraseña debe tener al menos 12 caracteres, incluir una letra mayúscula,números y caracteres especial.
+                        </small>
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.password2.id_for_label }}">Confirmar contraseña:</label>
+                        {{ form.password2 }}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.rol.id_for_label }}">Rol:</label>
+                        {{ form.rol }}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.tarjeta_credito.id_for_label }}">Tarjeta de crédito:</label>
+                        {{ form.tarjeta_credito }}
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">{% if editar %}Actualizar{% else %}Registrar{% endif %}</button>
+                    <a
+                        id="cancel"
+                        href="{% url 'login_app:index' %}"
+                        class="btn btn-danger"
+                        role="button"
+                    >Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

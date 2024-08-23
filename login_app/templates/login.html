@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMP | LOGIN</title>
+  
+    <link rel="icon" href="{% static '/img/tmp_icon.ico' %}">
+
+    <link href="{% static "css/login_css.css" %}" rel="stylesheet">
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+</head>
+<body>
+  {% if messages %}
+  <div class="alert-container">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" id="alert-alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+    <div class="vh-100 w-100 d-flex align-items-center" id="mainBgn">
+        <div class="formContainer">
+          <div class="text-center mb-4 pb-3">
+            <img src="{% static "/img/tmp_img.png" %}" alt="Company Logo" height="48">
+          </div>
+          <form method="post">
+            {% csrf_token %}
+            <div>
+              <span class="inputLogo"><i class="fas fa-lock"></i></span><input type="text" class="form-control rounded-pill" name="username" placeholder="Usuario">
+            </div>
+            <div class="my-2">
+              <span class="inputLogo"><i class="fas fa-key"></i></span><input type="password" class="form-control rounded-pill" name="password" placeholder="Contraseña">
+            </div>
+            <button class="btn btn-accent rounded-pill w-100" type="submit">Entrar</button>
+          </form>
+        </div>
+      </div>
+
+    <script src="{% static "js/bootstrap.bundle.min.js" %}"></script>
+    <script src="{% static "js/bootstrap.min.js" %}"></script>
+    <script>
+      // Cierra el mensaje después de 1 segundo
+      setTimeout(function() {
+        document.querySelector("#alert-alert").remove();
+      }, 1000); // 1000 milisegundos = 1 segundo
+  </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+{% extends 'dashboard.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary" style="margin-right: auto;">PRODUCTOS</h6>
+        <div style="display: flex;">
+            <a href={% url 'almacen_app:exportar_excel' %} style="text-decoration: none; background-color: transparent; border: none;" title="Exportar Excel">
+                <i class="fas fa-file-excel" style="color: green; font-size: 26px;"></i>
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-12">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Número de artículo</th>
+                        <th>Producto</th>
+                        <th>Descripción</th>
+                        <th>OEM</th>
+                        <th>Compatibilidad</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for producto in productos %}
+                        <tr>
+                            <td style="width: 100px">
+                                {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.descripcion }}" style="max-width: 100%; height: auto; display: block;">
+                                {% else %}
+                                <img src="{% static 'img/tmp_img.png' %}" alt="Imagen por defecto" style="max-width: 100%; height: auto; display: block;">
+                                {% endif %}
+                            </td>
+                            <td onclick="window.location='{% url 'almacen_app:detalle_producto' producto_id=producto.id %}'" style="cursor: pointer;">{{producto.codigo}}</td>
+                            <td onclick="window.location='{% url 'almacen_app:detalle_producto' producto_id=producto.id %}'" style="cursor: pointer;">{{producto.nombre}}</td>
+                            <td onclick="window.location='{% url 'almacen_app:detalle_producto' producto_id=producto.id %}'" style="cursor: pointer;" data-search="{{ producto.descripcion }}">{{producto.descripcion |truncatewords:1}}</td>
+                            <td onclick="window.location='{% url 'almacen_app:detalle_producto' producto_id=producto.id %}'" style="cursor: pointer;" data-search="{{ producto.oem }}">{{producto.oem |truncatewords:1}}</td>
+                            <td onclick="window.location='{% url 'almacen_app:detalle_producto' producto_id=producto.id %}'" style="cursor: pointer;" data-search="{{ producto.compatibilidad }}">{{producto.compatibilidad |truncatewords:1}}</td>
+                            <td onclick="window.location='{% url 'almacen_app:detalle_producto' producto_id=producto.id %}'" style="cursor: pointer;">{{producto.precio}}</td>
+                            <td onclick="window.location='{% url 'almacen_app:detalle_producto' producto_id=producto.id %}'" style="cursor: pointer;">{{producto.cantidad}}</td>
+                            <td width="400px">
+                                <form action="{% url 'almacen_app:delete_producto' product_id=producto.id %}" method="POST" id="delete-producto-form-{{ producto.id }}">
+                                    {% csrf_token %}
+                                    {% if user.is_superuser or user.rol == 'almacenero' %}
+                                        <a class="btn btn-primary small-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Editar Producto" href={% url 'almacen_app:edit_producto' product_id=producto.id %}>
+                                            <i class="fa fa-edit"></i>
+                                        </a> 
+                        
+                                        <a class="btn btn-danger small-icon" href="#" data-toggle="modal" data-target="#deleteProductoModal" title="Eliminar Producto" onclick="setDeleteProductoId({{ producto.id }})">
+                                            <i class="fa fa-trash-alt"></i>
+                                        </a>
+                        
+                                        <a type="button" class="btn btn-info small-icon" title="Añadir a almacén" href="{% url 'almacen_app:add_almacen' producto_id=producto.id %}">
+                                            <i class="fa fa-store"></i>
+                                        </a>
+                                
+                                        <a type="submit" class="btn btn-warning small-icon" title="Añadir a estante" href="{% url 'almacen_app:add_estante' producto_id=producto.id %}">
+                                            <i class="fa fa-plus"></i>
+                                        </a>
+                        
+                                    {% endif %}
+                                    <a class="btn btn-success small-icon" data-bs-toggle="tooltip" data-bs-placement="right" title="Detalle Producto" href="{% url 'almacen_app:detalle_producto' producto_id=producto.id %}">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+                                </form>
+                            </td>
+                        </tr> 
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+<div class="modal fade" id="almacenModal" tabindex="-1" role="dialog" aria-labelledby="almacenModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="almacenModalLabel">Seleccionar Almacén</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí debes mostrar una lista de todos los almacenes disponibles -->
+                {% for almacen in almacenes %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="almacen_id" value="{{ almacen.id }}">
+                        <label class="form-check-label">{{ almacen.nombre }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="agregarProductoAlmacen()">Añadir a Almacén</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+

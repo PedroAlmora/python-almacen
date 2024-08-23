@@ -1,0 +1,88 @@
+{% extends 'dashboard.html' %} {% load static %} {% block content %}
+{% if messages %}
+  <div class="alert-container">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" id="alert-alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+<div class="card shadow mb-4">
+  <div class="card-body">
+    {% if is_editing %}
+    <h4>Actualizar Estante</h4>
+    {% else %}
+    <h4>Registrar Estante</h4>
+    {% endif %}
+  </div>
+</div>
+<div class="card shadow mb-4">
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">   
+            <div class="form-group">
+              <label for="{{ form.nombre.id_for_label }}" class="form-label"
+                >Nombre:</label
+              >
+              <input
+                type="text"
+                name="nombre"
+                id="{{ form.nombre.id_for_label }}"
+                class="form-control"
+                value="{{ form.nombre.value|default:'' }}"
+              />
+            </div>
+           
+          </div>
+          <div class="col-md-6">
+            <div class="card shadow mb-4">
+              <div class="card-header py-3 d-flex justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Seleccionar Productos</h6>
+              </div>
+              <div class="card-body" style="max-height: 200px; overflow-y: auto;">
+                <input type="text" id="searchProductAlmacen" class="form-control mb-2" placeholder="Buscar producto...">
+                <div id="productsList">
+                  {% for choice_value, choice_label in form.productos.field.choices %}
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" name="{{ form.productos.html_name }}" value="{{ choice_value }}" id="producto-{{ choice_value }}" {% if choice_value in form.productos.value %}checked{% endif %}>
+                      <label class="form-check-label" for="producto-{{ choice_value }}">{{ choice_label }}</label>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="form-group mt-3">
+        {% if is_editing %}
+        <button type="submit" class="btn btn-primary mr-2">Actualizar</button>
+        <a
+          id="cancel"
+          href="{% url 'login_app:index' %}"
+          class="btn btn-danger"
+          role="button"
+          >Cancelar</a
+        >
+        {% else %}
+        <button type="submit" class="btn btn-primary mr-2">Registrar</button>
+        <a
+          id="cancel"
+          href="{% url 'almacen_app:almacenes' %}"
+          class="btn btn-danger"
+          role="button"
+          >Cancelar</a
+        >
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

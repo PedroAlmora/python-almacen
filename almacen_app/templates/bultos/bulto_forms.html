@@ -1,0 +1,103 @@
+{% extends 'dashboard.html' %} {% load static %} {% block content %}
+
+{% if messages %}
+  <div class="alert-container">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" id="alert-alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="card shadow mb-4">
+  <div class="card-body">
+    <div class="card-header py-3 d-flex justify-content-between">
+      <h6 class="m-0 font-weight-bold text-primary">Registar Bulto</h6>
+      <a href="#" style="text-decoration: none; background-color: transparent; border: none;">
+        <i class="fas fa-file-excel" style="color: green; font-size: 26px;"></i>
+      </a>
+  </div>
+  </div>
+</div>
+<div class="card shadow mb-4">
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="container">
+        <div class="form-group mt-3">
+          <div class="form-row justify-content-center">
+            <div class="col text-center">
+              <label class="form-label">Nombre:</label>
+              {{ form.nombre_bulto }}
+            </div>
+            <div class="col text-center">
+              <label class="form-label">Código de Barras:</label>
+              {{ form.codigo_barras }}
+            </div>
+          </div>
+        </div>
+        
+      
+        <div class="table-responsive">
+          <table class="table table-bordered" id="bulto_producto" width="100%" cellspacing="0">
+              <thead>
+                  <tr>
+                      <th>Nombre</th>
+                      <th>Cantidad</th>
+                  </tr>
+              </thead>
+              
+              <tbody>
+                {% for producto in productos %}
+                <tr>
+                  <td>{{ producto.nombre }}</td>
+                  <td>{{ producto.cantidad }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+          </table>
+      </div>
+      
+      <div class="form-group mt-3">
+        <a
+        id="listo"
+        href="{% url 'almacen_app:create_bulto_final' %}"
+        class="btn btn-primary"
+        role="button"
+        >Registrar
+        </a>
+
+        <a
+        id="listo"
+        href="{% url 'almacen_app:bultos' %}"
+        class="btn btn-danger"
+        role="button"
+        >Cancelar
+        </a>
+
+        <button  name="cancelar" id="cancelar" class="btn btn-danger" style="display: none;">Cancelar</button>
+      </div>
+    </form>
+      </div>
+    
+  </div>
+</div>
+<script>
+  // Esperar a que el documento esté listo
+  document.addEventListener('DOMContentLoaded', function() {
+    // Obtener el campo del código de barras
+    const codigoBarrasInput = document.getElementById('id_codigo_barras');
+    
+    // Vaciar el campo del código de barras
+    codigoBarrasInput.value = '';
+    
+    // Seleccionar automáticamente el campo del código de barras
+    codigoBarrasInput.focus();
+  });
+</script>
+
+{% endblock %}

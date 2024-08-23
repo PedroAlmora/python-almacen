@@ -1,0 +1,71 @@
+{% extends 'dashboard.html' %}
+
+
+
+{% block content %}
+{% if messages %}
+  <div class="alert-container">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" id="alert-alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+    {% endfor %}
+  </div>
+{% endif %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">USUARIOS</h6>
+        {% if user.is_superuser %}
+        <a href={% url 'login_app:registrar_usuario' %} class="btn btn-warning">
+            <i class="fas fa-plus"></i> <span class="ml-1">AÑADIR</span>
+        </a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Nombre y Apellidos</th>
+                        <th>Rol</th>
+                        {% if user.is_superuser %}
+                        <th>Acción</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{usuario.username}}</td>
+                        <td>{{usuario.first_name}} {{usuario.last_name}}</td>
+                        <td>{{usuario.rol}}</td>
+                        {% if user.is_superuser %}
+                        <td width="100px">
+                            <form  method="POST" action="{% url 'login_app:eliminar_usuario' usuario_id=usuario.id %}" id="delete-user-form-{{ usuario.id }}">
+                                {% csrf_token %}
+                                    
+    
+                                    <a class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="right"
+                                    title="Editar Usuario" href="{% url 'login_app:editar_usuario' usuario_id=usuario.id %}"><i class="fa fa-edit" ></i></a> 
+    
+                                    <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteUserModal" onclick="setDeleteFormId({{ usuario.id }})">
+                                        <i class="fa fa-trash-alt"></i>
+                                    </a>
+                                    
+                            </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %} 
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

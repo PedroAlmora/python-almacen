@@ -1,0 +1,67 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Tuberías y Mangueras</h6>
+        
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Número de artículo</th>
+                        <th>Producto</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for tuberias_mangueras in tuberias_mangueras %}
+                    <tr>
+                        <td style="width: 100px">
+                            {% if tuberias_mangueras.imagen %}
+                              <img src="{{ tuberias_mangueras.imagen.url }}" alt="{{ tuberias_mangueras.descripcion }}" style="max-width: 100%; height: auto; display: block;">
+                            {% else %}
+                              <img src="{% static 'img/tmp_img.png' %}" alt="Imagen por defecto" style="max-width: 100%; height: auto; display: block;">
+                            {% endif %}
+                          </td>
+                        <td>{{tuberias_mangueras.codigo}}</td>
+                        <td>{{tuberias_mangueras.nombre}}</td>
+                        <td>{{tuberias_mangueras.descripcion |truncatewords:1}}</td>
+                        <td>{{tuberias_mangueras.precio}}</td>
+                        <td>{{tuberias_mangueras.cantidad}}</td>
+                        <td width="200px">
+                            <form action="{% url 'almacen_app:delete_producto' product_id=tuberias_mangueras.id %}" method="POST" id="delete-producto-form-{{ tuberias_mangueras.id }}">
+                                {% csrf_token %}
+                                    
+                                {% if user.is_superuser or user.rol == 'almacenero' %}
+                                    <a class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="right"
+                                    title="Editar Producto" href={% url 'almacen_app:edit_producto' product_id=tuberias_mangueras.id %}><i class="fa fa-edit" ></i></a> 
+    
+                                    <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteProductoModal" onclick="setDeleteProductoId({{ tuberias_mangueras.id }})">
+                                        <i class="fa fa-trash-alt"></i>
+                                    </a>
+                                    {% endif %}
+
+                                    <a class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="right"
+                                    title="Detalles" href="{% url 'almacen_app:detalle_producto' producto_id=tuberias_mangueras.id %}"><i class="fa fa-eye" ></i></a>
+                                    
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %} 
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

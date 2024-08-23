@@ -1,0 +1,85 @@
+{% extends 'dashboard.html' %}
+
+
+
+{% block content %}
+{% if messages %}
+  <div class="alert-container">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" id="alert-alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">DESPACHOS</h6>
+        {% if user.is_superuser or user.rol == 'almacenero' %}
+        <div style="display: flex;">
+            <a href="{% url 'almacen_app:cargar_despacho_excel' %}" style="text-decoration: none; background-color: transparent; border: none; margin-right: 10px;">
+                <i class="fas fa-upload" style="color: blue; font-size: 26px; border: 1px solid black; padding: 6px;"></i>
+            </a>
+            <a href="{% url 'almacen_app:create_despacho' %}" class="btn btn-warning">
+                <i class="fas fa-plus"></i> <span class="ml-1">AÑADIR</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for despacho in despachos %}
+                <tr>
+                  <td>{{ despacho.nombre }}</td>
+                  <td>{{ despacho.fecha }}</td>
+                  <td>{{ despacho.cliente }}</td>
+                  <td width="200px">
+                    <form action="{% url 'almacen_app:delete_despacho' despacho_id=despacho.id %}" method="POST" id="delete-despacho-form-{{ despacho.id }}">
+                        {% csrf_token %}
+                            
+                        
+
+                             <a class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="right"
+                            title="Detalle Despacho" href={% url 'almacen_app:detalles_despacho' despacho_id=despacho.id %}><i class="fa fa-eye" ></i></a> 
+
+                            {% if user.is_superuser or user.rol == 'almacenero' %}
+                            <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteDespachoModal" onclick="setDeleteDespachoId({{ despacho.id }})">
+                                <i class="fa fa-trash-alt"></i>
+                            </a>
+
+                            {% if not despacho.insertado %}
+                                <a class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="right"
+                                title="Insertar Despacho" href={% url 'almacen_app:insertar_despacho' despacho_id=despacho.id %} ><i class="fa fa-check" ></i></a> 
+                            {% endif %}
+
+                            <a class="btn btn-light" data-bs-toggle="tooltip" data-bs-placement="right" 
+                                title="Exportar Modelo" href={% url 'almacen_app:exportar_despacho' despacho_id=despacho.id %}>
+                                <i class="fa fa-file-excel" style="color: green; font-size: 18px;"></i> 
+                            </a>
+                            {% endif %}
+                    </form>
+                </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

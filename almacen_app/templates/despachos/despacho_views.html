@@ -1,0 +1,45 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">DETALLES: {{ despacho.nombre }}</h6>
+        <h6 class="m-0 font-weight-bold text-primary">CLIENTE: {{ despacho.cliente }}</h6>
+        <h6 class="m-0 font-weight-bold text-primary">FECHA DE REGISTRO: {{ despacho.fecha }}</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered"  width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        
+                    </tr>
+                </thead>
+                
+                <tbody>
+                {% for d in despacho.productos %} 
+                <tr>
+                  <td>{{ d.nombre }}</td>
+                  <td>{{ d.cantidad }}</td>
+                  
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-header py-3 d-flex justify-content-between">
+    <a
+        id="cancel"
+        href="{% url 'almacen_app:despachos' %}"
+        class="btn btn-danger"
+        role="button"
+        >Regresar
+    </a>
+    </div>
+</div>
+
+{% endblock %}

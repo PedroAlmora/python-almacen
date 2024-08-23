@@ -1,0 +1,255 @@
+{% extends 'dashboard.html' %} {% load static %} {% block content %}
+
+{% if messages %}
+  <div class="alert-container">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" id="alert-alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<style>
+  .form-label.required::after {
+      content: ' *';
+      color: red;
+  }
+</style>
+
+<div class="card shadow mb-4">
+  <div class="card-body">
+    {% if is_editing %}
+    <h4>Actualizar Producto</h4>
+    {% else %}
+    <h4>Registrar Producto</h4>
+    {% endif %}
+  </div>
+</div>
+<div class="card shadow mb-4">
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="{{ form.codigo.id_for_label }}" class="form-label"
+                >Número de artículo:</label
+              >
+              <input
+                type="text"
+                name="codigo"
+                id="{{ form.codigo.id_for_label }}"
+                class="form-control"
+                value="{{ form.codigo.value|default:'' }}"
+                
+              />
+            </div>
+            <div class="form-group">
+              <label
+                for="{{ form.codigo_barras.id_for_label }}"
+                class="form-label"
+                >Código de barras:</label
+              >
+              <input
+                type="text"
+                name="codigo_barras"
+                id="{{ form.codigo_barras.id_for_label }}"
+                class="form-control"
+                value="{{ form.codigo_barras.value|default:'' }}"
+              
+              />
+            </div>
+            <div class="form-group">
+              <label for="{{ form.nombre.id_for_label }}" class="form-label"
+                >Producto:</label
+              >
+              <input
+                type="text"
+                name="nombre"
+                id="{{ form.nombre.id_for_label }}"
+                class="form-control"
+                value="{{ form.nombre.value|default:'' }}"
+            
+              />
+            </div>
+            <div class="form-group">
+              <label
+                for="{{ form.descripcion.id_for_label }}"
+                class="form-label"
+                >Descripción:</label
+              >
+              <textarea
+                name="descripcion"
+                id="{{ form.descripcion.id_for_label }}"
+                class="form-control"
+              > {{ form.descripcion.value|default:'' }}</textarea>
+            </div>
+            <div class="form-group">
+              <label
+                for="{{ form.oem.id_for_label }}"
+                class="form-label"
+                >OEM/ Piezas similares:</label
+              >
+              <textarea
+                name="oem"
+                id="{{ form.oem.id_for_label }}"
+                class="form-control"
+              >{{ form.oem.value|default:'' }}</textarea>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="{{ form.precio.id_for_label }}" class="form-label required"
+                >Precio:</label
+              >
+              <input
+                type="text"
+                name="precio"
+                id="{{ form.precio.id_for_label }}"
+                class="form-control"
+                value="{{ form.precio.value|default:'' }}"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="{{ form.cantidad.id_for_label }}" class="form-label required"
+                >Cantidad:</label
+              >
+              <input
+                type="text"
+                name="cantidad"
+                id="{{ form.cantidad.id_for_label }}"
+                class="form-control"
+                value="{{ form.cantidad.value|default:'' }}"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="{{ form.compatibilidad.id_for_label }}" class="form-label"
+                >Compatibilidad:</label
+              >
+              <input
+                type="text"
+                name="compatibilidad"
+                id="{{ form.compatibilidad.id_for_label }}"
+                class="form-control"
+                value="{{ form.compatibilidad.value|default:'' }}"
+              />
+            </div>
+            <div class="form-group">
+              <label for="{{ form.imagen.id_for_label }}" class="form-label"
+                >Imagen:</label
+              >
+              <div class="custom-file">
+                <input
+                  type="file"
+                  name="imagen"
+                  id="{{ form.imagen.id_for_label }}"
+                  class="custom-file-input"
+                  accept="image/*"
+                  onchange="previewImage(event)"
+                  data-browse="Imagen"
+                />
+                <label
+                  class="custom-file-label"
+                  for="{{ form.imagen.id_for_label }}"
+                  >Seleccionar archivo</label
+                >
+              </div>
+              <img
+                id="preview"
+                class="img-fluid mt-2 img-thumbnail"
+                style="display: none; max-height: 200px"
+              />
+            </div>
+            <div class="form-group">
+              <label
+                for="{{ form.campo_predefinido.id_for_label }}"
+                class="form-label"
+                >Clasificación:</label
+              >
+              <select
+                name="campo_predefinido"
+                id="{{ form.campo_predefinido.id_for_label }}"
+                class="custom-select"
+              >
+                <option
+                  value=""
+                  disabled
+                  selected
+                  hidden
+                  style="
+                    text-align: center;
+                    padding: 0.375rem 1.75rem 0.375rem 0.75rem;
+                  "
+                >
+                  ---Seleccione---
+                </option>
+                <option value="Neumáticos y productos relacionados" {% if form.campo_predefinido.value == 'Neumáticos y productos relacionados' %}selected{% endif %}>Neumáticos y productos relacionados</option>
+                <option value="Aceites y líquidos" {% if form.campo_predefinido.value == 'Aceites y líquidos' %}selected{% endif %}>Aceites y líquidos</option>
+                <option value="Frenos" {% if form.campo_predefinido.value == 'Frenos' %}selected{% endif %}>Frenos</option>
+                <option value="Filtros" {% if form.campo_predefinido.value == 'Filtros' %}selected{% endif %}>Filtros</option>
+                <option value="Motor" {% if form.campo_predefinido.value == 'Motor' %}selected{% endif %}>Motor</option>
+                <option value="Sistema limpiaparabrisas" {% if form.campo_predefinido.value == 'Sistema limpiaparabrisas' %}selected{% endif %}>Sistema limpiaparabrisas</option>
+                <option value="Encendido y precalentamiento" {% if form.campo_predefinido.value == 'Encendido y precalentamiento' %}selected{% endif %}>Encendido y precalentamiento</option>
+                <option value="Suspensión" {% if form.campo_predefinido.value == 'Suspensión' %}selected{% endif %}>Suspensión</option>
+                <option value="Sistema eléctrico" {% if form.campo_predefinido.value == 'Sistema eléctrico' %}selected{% endif %}>Sistema eléctrico</option>
+                <option value="Amortiguación" {% if form.campo_predefinido.value == 'Amortiguación' %}selected{% endif %}>Amortiguación</option>
+                <option value="Correas, cadenas, rodillos" {% if form.campo_predefinido.value == 'Correas, cadenas, rodillos' %}selected{% endif %}>Correas, cadenas, rodillos</option>
+                <option value="Sistema de refrigeración del motor" {% if form.campo_predefinido.value == 'Sistema de refrigeración del motor' %}selected{% endif %}>Sistema de refrigeración del motor</option>
+                <option value="Carrocería" {% if form.campo_predefinido.value == 'Carrocería' %}selected{% endif %}>Carrocería</option>
+                <option value="Calefacción y ventilación" {% if form.campo_predefinido.value == 'Calefacción y ventilación' %}selected{% endif %}>Calefacción y ventilación</option>
+                <option value="Juntas y retenes" {% if form.campo_predefinido.value == 'Juntas y retenes' %}selected{% endif %}>Juntas y retenes</option>
+                <option value="Escape" {% if form.campo_predefinido.value == 'Escape' %}selected{% endif %}>Escape</option>
+                <option value="Interior" {% if form.campo_predefinido.value == 'Interior' %}selected{% endif %}>Interior</option>
+                <option value="Sistema de combustible" {% if form.campo_predefinido.value == 'Sistema de combustible' %}selected{% endif %}>Sistema de combustible</option>
+                <option value="Dirección" {% if form.campo_predefinido.value == 'Dirección' %}selected{% endif %}>Dirección</option>
+                <option value="Embrague" {% if form.campo_predefinido.value == 'Embrague' %}selected{% endif %}>Embrague</option>
+                <option value="Palier y junta homocinética" {% if form.campo_predefinido.value == 'Palier y junta homocinética' %}selected{% endif %}>Palier y junta homocinética</option>
+                <option value="Remolque / piezas adicionales" {% if form.campo_predefinido.value == 'Remolque / piezas adicionales' %}selected{% endif %}>Remolque / piezas adicionales</option>
+                <option value="Caja de cambios" {% if form.campo_predefinido.value == 'Caja de cambios' %}selected{% endif %}>Caja de cambios</option>
+                <option value="Aire acondicionado" {% if form.campo_predefinido.value == 'Aire acondicionado' %}selected{% endif %}>Aire acondicionado</option>
+                <option value="Rodamientos" {% if form.campo_predefinido.value == 'Rodamientos' %}selected{% endif %}>Rodamientos</option>
+                <option value="Árboles de transmisión y diferenciales" {% if form.campo_predefinido.value == 'Árboles de transmisión y diferenciales' %}selected{% endif %}>Árboles de transmisión y diferenciales</option>
+                <option value="Sensores, relés, unidades de control" {% if form.campo_predefinido.value == 'Sensores, relés, unidades de control' %}selected{% endif %}>Sensores, relés, unidades de control</option>
+                <option value="Accesorios para coches" {% if form.campo_predefinido.value == 'Accesorios para coches' %}selected{% endif %}>Accesorios para coches</option>
+                <option value="Kits de reparación y herramientas" {% if form.campo_predefinido.value == 'Kits de reparación y herramientas' %}selected{% endif %}>Kits de reparación y herramientas</option>
+                <option value="Tuberías y mangueras" {% if form.campo_predefinido.value == 'Tuberías y mangueras' %}selected{% endif %}>Tuberías y mangueras</option>
+                <option value="Iluminación" {% if form.campo_predefinido.value == 'Iluminación' %}selected{% endif %}>Iluminación</option>
+                <option value="Sujeciones" {% if form.campo_predefinido.value == 'Sujeciones' %}selected{% endif %}>Sujeciones</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group mt-3">
+        {% if is_editing %}
+        <button type="submit" class="btn btn-primary mr-2">Actualizar</button>
+        <a
+          id="cancel"
+          href="{% url 'login_app:index' %}"
+          class="btn btn-danger"
+          role="button"
+          >Cancelar</a
+        >
+        {% else %}
+        <button type="submit" class="btn btn-primary mr-2">Registrar</button>
+        <a
+          id="cancel"
+          href="{% url 'login_app:index' %}"
+          class="btn btn-danger"
+          role="button"
+          >Cancelar</a
+        >
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

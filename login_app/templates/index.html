@@ -1,0 +1,189 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block content %}
+
+{% if messages %}
+<div class="alert-container">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" id="alert-alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-xl-12">
+            {% if user.is_authenticated %}
+            {% if user.is_superuser or user.rol == 'almacenero' or user.rol == 'visitante' %}
+            <div class="container">
+                <div class="row justify-content-center mt-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" id="busquedaInput" class="form-control bg-light border-2 small"
+                                    placeholder="Buscar por código OEM" aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button id="btnBuscar" class="btn btn-warning" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Productos (Total)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ cantidad_productos }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Almacen (Disponibilidad)
+                            </div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">
+                                        {{ porcentaje_disponibilidad }}%
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="progress progress-sm mr-2">
+                                        <div class="progress-bar bg-info" role="progressbar"
+                                            style="width: {{ porcentaje_disponibilidad }}%"
+                                            aria-valuenow="{{ porcentaje_disponibilidad }}" aria-valuemin="0"
+                                            aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <a  href={% url 'almacen_app:productos_agotados' %}>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Productos (Agotados)</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_agotados }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-cart-arrow-down fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Ingreso (Total)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$ {{ sumatoria_precios }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="row">
+        {% comment %} Grafico de Barras {% endcomment %}
+        <div class="row">
+            <div class="col-lg-12 col-xl-12">
+                <div class="card shadow mb-4">
+                    <!-- Card Header - Dropdown -->
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Documentos de Interés</h6>
+                    </div>
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <div class="col-xl-12 col-md-12 mb-12">
+                                <div class="card border-left-danger shadow h-100 py-2">
+                                    <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                        Excel de Productos
+                                                    </div>
+                                                    <a  href={% url 'almacen_app:exportar_excel_productos' %}>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800">Descargar</div>
+                                                    </a>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-store fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-12 col-md-12 mb-12 mt-5">
+                                <div class="card border-left-info shadow h-100 py-2">
+                                    <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                        Excel de Despacho
+                                                    </div>
+                                                    <a  href={% url 'almacen_app:exportar_excel_despacho' %}>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800">Descargar</div>
+                                                    </a>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-truck fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

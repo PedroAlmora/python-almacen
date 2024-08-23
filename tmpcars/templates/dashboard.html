@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {% load static %}
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+
+    <link rel="icon" href="{% static 'img/tmp_icon.ico' %}">
+
+    <title>TMP | GESTIÓN</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'datatables/DataTables-1.13.5/js/dataTables.bootstrap4.min.css' %}" rel="stylesheet"
+        type="text/css">
+    <link href="{% static 'datatables/datatables.min.css' %}" rel="stylesheet" type="text/css">
+
+    <style>
+        .small-icon {
+            font-size: 8px;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href={% url 'login_app:index' %}>
+                <div class="sidebar-brand-icon ">
+                    <img src="{% static 'img/tmp_img.png' %}" alt="Logo" style="width: 100px; height: auto;">
+                </div>
+                <div class="sidebar-brand-text mx-3">SISTEMA</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            {% if user.is_authenticated %}
+            {% if user.is_superuser or user.rol == 'almacenero' or user.rol == 'visitante' %}
+            <li class="nav-item active">
+                <a class="nav-link" href={% url 'login_app:index' %}>
+                    <i class="fas fa-fw fa fa-car"></i>
+                    <span>Inicio</span>
+                </a>
+            </li>
+            {% endif %}
+            {% endif %}
+
+            {% if user.is_authenticated %}
+            {% if user.is_superuser or user.rol == 'admin' %}
+            <li class="nav-item">
+                <a class="nav-link" href={% url 'login_app:registrar_usuario' %}>
+                    <i class="fas fa-fw fa-user-plus"></i>
+                    <span>Registrar Usuario</span>
+                </a>
+            </li>
+            {% endif %}
+            {% endif %}
+
+            {% if user.is_authenticated %}
+            {% if user.is_superuser or user.rol == 'admin' %}
+            <li class="nav-item">
+                <a class="nav-link" href={% url 'login_app:lista_usuarios' %}>
+                    <i class="fas fa-fw fa fa-users"></i>
+                    <span>Listado de Usuarios</span>
+                </a>
+            </li>
+            {% endif %}
+            {% endif %}
+
+            {% if user.is_authenticated %}
+            {% if user.is_superuser or user.rol == 'admin' %}
+            <li class="nav-item">
+                <a class="nav-link" href={% url 'almacen_app:logsUsers' %}>
+                    <i class="fas fa-fw fa-history"></i>
+                    <span>Registro de Acciones</span>
+                </a>
+            </li>
+            {% endif %}
+            {% endif %}
+
+
+            {% if user.is_authenticated %}
+            {% if user.is_superuser or user.rol == 'almacenero' or user.rol == 'visitante' %}
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+
+            <div class="sidebar-heading">
+                ALMACÉN
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+
+            <li class="nav-item">
+                <a class="nav-link" href={% url 'almacen_app:almacenes' %}>
+                    <i class="fas fa-fw fa fa-building"></i>
+                    <span>Almacenes</span>
+                </a>
+            </li>
+
+            {% if user.is_superuser or user.rol == 'almacenero' %}
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+                    aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-fw fa-shopping-cart"></i>
+                    <span>Productos</span>
+                </a>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Gestión de Productos:</h6>
+                        <a class="collapse-item" href={% url 'almacen_app:create_producto' %}>Registrar Producto</a>
+                        <a class="collapse-item" href={% url 'almacen_app:importar_excel' %}>Importar Productos</a>
+                    </div>
+                </div>
+            </li>
+            {% endif %}
+
+            <!-- Nav Item - Utilities Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+                    aria-expanded="true" aria-controls="collapseUtilities">
+                    <i class="fas fa-fw fa-map"></i>
+                    <span>Inventario</span>
+                </a>
+                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Items:</h6>
+                        <a class="collapse-item" href={% url 'almacen_app:neumaticos' %}>Neumáticos</a>
+                        <a class="collapse-item" href={% url 'almacen_app:frenos' %}>Frenos</a>
+                        <a class="collapse-item" href={% url 'almacen_app:motor' %}>Motor</a>
+                        <a class="collapse-item" href={% url 'almacen_app:aceites_y_lubricantes' %}>Aceites y<br>Lubricantes</a>
+                        <a class="collapse-item" href={% url 'almacen_app:limpiaparabrisas_escobillas'%}>Limpiaparabrisa-<br>Escobilla</a>
+                        <a class="collapse-item" href={% url 'almacen_app:suspension' %}>Suspensión</a>
+                        <a class="collapse-item" href={% url 'almacen_app:sistema_electrico' %}>Sistema Eléctrico</a>
+                        <a class="collapse-item" href={% url 'almacen_app:endendido_precalentamiento' %} style="font-size: small;">
+                            Encendido y<br>Precalentamiento</a>
+                        <a class="collapse-item" href={% url 'almacen_app:correas_cadenas_rodillos'%}>Correas-<br>Cadenas-Rodillos</a>
+                        <a class="collapse-item" href={% url 'almacen_app:carroceria' %}>Carrocería</a>
+                        <a class="collapse-item" href={% url 'almacen_app:calefaccion_ventilacion' %}>Calefacción y<br>Ventilación</a>
+                        <a class="collapse-item" href={% url 'almacen_app:baterias' %}>Escape</a>
+                        <a class="collapse-item" href={% url 'almacen_app:sistema_combustible' %}>Sistema de<br>Combustible</a>
+                        <a class="collapse-item" href={% url 'almacen_app:direccion' %}>Dirección</a>
+                        <a class="collapse-item" href={% url 'almacen_app:amortiguacion' %}>Amortiguación</a>
+                        <a class="collapse-item" href={% url 'almacen_app:sistema_refrigeracion' %}>Sistema de<br>Refrigeración</a>
+                        <a class="collapse-item" href={% url 'almacen_app:juntas_retrenes' %}>Juntas y Retenes</a>
+                        <a class="collapse-item" href={% url 'almacen_app:interior' %}>Interior</a>
+                        <a class="collapse-item" href={% url 'almacen_app:embrague' %}>Embrague</a>
+                        <a class="collapse-item" href={% url 'almacen_app:caja_cambios' %}>Caja de Cambios</a>
+                        <a class="collapse-item" href={% url 'almacen_app:aire_acondicionado' %}>Aire Acondicionado</a>
+                        <a class="collapse-item" href={% url 'almacen_app:rodamientos' %}>Rodamientos</a>
+                        <a class="collapse-item" href={% url 'almacen_app:transmision_diferencial' %}>Transmisión y<br>Diferencial</a>
+                        <a class="collapse-item" href={% url 'almacen_app:kit_reparacion' %}>Kit de Reparación</a>
+                        <a class="collapse-item" href={% url 'almacen_app:accesorios' %}>Accesorios</a>
+                        <a class="collapse-item" href={% url 'almacen_app:tuberias_mangueras' %}>Tuberías y<br>Mangueras</a>
+                        <a class="collapse-item" href={% url 'almacen_app:iluminacion' %}>Iluminación</a>
+                        <a class="collapse-item" href={% url 'almacen_app:sensores-relés-unidades-de-control' %} style="font-size: small;">
+                            Sensores-relés-<br>unidades de control</a>
+                        <a class="collapse-item" href={% url 'almacen_app:remolque-piezas-adicionales' %} style="font-size: small;">
+                            Remolque-<br>piezas adicionales</a>
+                        <a class="collapse-item" href={% url 'almacen_app:pailer-juntas-homocinetica' %} style="font-size: small;">
+                            Palier y <br>junta homocinética</a>
+                        <a class="collapse-item" href={% url 'almacen_app:sujeciones' %}>Sujeciones</a>
+                        <a class="collapse-item" href={% url 'almacen_app:productos' %}>TODOS</a>
+                    </div>
+                </div>
+            </li>
+
+            <li class="nav-item ">
+                <a class="nav-link" href={% url 'almacen_app:bultos' %}>
+                    <i class="fas fa-fw fa fa-box"></i>
+                    <span>Bultos</span></a>
+            </li>
+
+            <li class="nav-item ">
+                <a class="nav-link" href={% url 'almacen_app:despachos' %}>
+                    <i class="fas fa-fw fa fa-cart-arrow-down"></i>
+                    <span>Despachos</span></a>
+            </li>
+            {% endif %}
+            {% endif %}
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Search -->
+                    <form
+                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <input type="text" id="search-input-index" class="form-control" placeholder="Buscar productos...">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" id="search-button-index">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                        <li class="nav-item dropdown no-arrow d-sm-none">
+                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search fa-fw"></i>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                                aria-labelledby="searchDropdown">
+                                <form class="form-inline mr-auto w-100 navbar-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light border-0 small"
+                                            placeholder="Search for..." aria-label="Search"
+                                            aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button">
+                                                <i class="fas fa-search fa-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    {% if user.first_name and user.last_name %}
+                                    {{ user.first_name }} {{ user.last_name }}
+                                    {% else %}
+                                    {{ user.username|capfirst }}
+                                    {% endif %}
+                                </span>
+                                <img class="img-profile rounded-circle" src="{% static 'img/undraw_profile.svg' %}">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            {% if user.is_authenticated %}
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href={% url 'login_app:cambiar_contrasenna' %}>
+                                    <i class="fas fa-key fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Cambiar Contraseña
+                                </a>
+
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Cerrar Sesión
+                                </a>
+                            </div>
+                            {%endif%}
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Pedro Luis González &copy; TMP-SYSTEM v1.0 2024</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Cerrar Sesión</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Esta seguro que desea cerrar la sesión?</div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" href={% url 'login_app:logout' %}>Aceptar</a>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Elemento</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body ">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 60px;"></i>
+                        <!-- Icono de advertencia -->
+                    </div>
+                    <h5>¿Está seguro que desea eliminar este elemento?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" onclick="submitForm()">Aceptar</button>
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="DespachoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Registar Despacho</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body ">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 60px;"></i>
+                        <!-- Icono de advertencia -->
+                    </div>
+                    <h5>¿Está seguro que desea registrar este despacho?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" onclick="submitFormDespacho()">Aceptar</button>
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Usuario</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body ">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 60px;"></i>
+                        <!-- Icono de advertencia -->
+                    </div>
+                    <h5>¿Está seguro que desea eliminar este usuario?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" onclick="confirmDelete()">Aceptar</button>
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteDespachoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Despacho</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body ">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 60px;"></i>
+                        <!-- Icono de advertencia -->
+                    </div>
+                    <h5>¿Está seguro que desea eliminar este despacho?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" onclick="confirmDeleteDespacho()">Aceptar</button>
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteBultoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Bulto</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body ">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 60px;"></i>
+                        <!-- Icono de advertencia -->
+                    </div>
+                    <h5>¿Está seguro que desea eliminar este bulto?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" onclick="confirmDeleteBulto()">Aceptar</button>
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteProductoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Producto</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body ">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 60px;"></i>
+                        <!-- Icono de advertencia -->
+                    </div>
+                    <h5>¿Está seguro que desea eliminar este producto?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" onclick="confirmDeleteProducto()">Aceptar</button>
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteAlmacenModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Almacén</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body ">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 60px;"></i>
+                        <!-- Icono de advertencia -->
+                    </div>
+                    <h5>¿Está seguro que desea eliminar este almacén?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" onclick="confirmDeleteAlmacen()">Aceptar</button>
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteEstanteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Estante</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body ">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 60px;"></i>
+                        <!-- Icono de advertencia -->
+                    </div>
+                    <h5>¿Está seguro que desea eliminar este estante?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" onclick="confirmDeleteEstante()">Aceptar</button>
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL CODIGO BARRAS-->
+    <div class="modal fade" id="miModal" tabindex="-1" role="dialog" aria-labelledby="miModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="miModalLabel">Información del Producto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar" style="color: red;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <img src="" id="imagenProducto" alt="Imagen del Producto" class="img-fluid">
+                    </div>
+                    <p>Nombre del Producto: <span id="nombreProducto"></span></p>
+                    <p>Producto: <span id="productoProducto"></span></p>
+                    <p>Descripción del Producto: <span id="descripcionProducto"></span></p>
+                    <p>Precio: <span id="precioProducto"></span></p>
+                    <p>Cantidad: <span id="cantidadProducto"></span></p>
+                    <p>Compatibilidad: <span id="compatibilidadProducto"></span></p>
+                    <p>Ubicación en la Web: <span id="ubicacionProducto"></span></p>
+                    <p>Almacenes en los que se encuentra: <span id="almacenesProducto"></span></p>
+                    <p>Estantes en los que se encuentra: <span id="estantesProducto"></span></p>
+
+                    <!-- Agrega más campos según tu modelo -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+
+    <!-- Page level plugins -->
+    <script src="{% static 'js/bulto.js' %}"></script>
+
+
+    <!-- Page level custom scripts -->
+    <script src="{% static 'js/demo/apexcharts.min.js' %}"></script>
+    <script src="{% static 'js/popper.js' %}"></script>
+    <script src="{% static 'js/bootstrap-multiselect.js' %}"></script>
+
+    <script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+    <!-- <script src="{% static 'datatables/Buttons-2.4.0/dataTables.buttons.min.js' %}"></script> -->
+    <!-- <script src="{% static 'datatables/Buttons-2.4.0/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'datatables/JSZip-3.10.1/jszip.min.js' %}"></script>
+    <script src="{% static 'datatables/pdfmake-0.2.7/pdfmake.min.js' %}"></script> -->
+    <!-- <script src="{% static 'datatables/pdfmake-0.2.7/vfs_fonts.js' %}"></script> -->
+    <!-- <script src="{% static 'datatables/datatables.min.js' %}"></script> -->
+
+    <script>
+        function submitForm() {
+            document.getElementById('delete-form').submit();
+        }
+    </script>
+
+    <script>
+        function submitFormDespacho() {
+            document.getElementById('despacho-excel-form').submit();
+        }
+    </script>
+
+    <script>
+        let deleteFormId = null;
+
+        function setDeleteFormId(userId) {
+            deleteFormId = userId;
+        }
+
+        function confirmDelete() {
+            if (deleteFormId !== null) {
+                const formId = `delete-user-form-${deleteFormId}`;
+                document.getElementById(formId).submit();
+            }
+        }
+    </script>
+
+    <script>
+        let deleteDespachoId = null;
+
+        function setDeleteDespachoId(despachoId) {
+            deleteDespachoId = despachoId;
+        }
+
+        function confirmDeleteDespacho() {
+            if (deleteDespachoId !== null) {
+                const DespachoformId = `delete-despacho-form-${deleteDespachoId}`;
+                document.getElementById(DespachoformId).submit();
+            }
+        }
+    </script>
+
+    <script>
+        let deleteEstanteId = null;
+
+        function setDeleteEstanteId(estanteId) {
+            deleteEstanteId = estanteId;
+        }
+
+        function confirmDeleteEstante() {
+            if (deleteEstanteId !== null) {
+                const EstanteformId = `delete-estante-form-${deleteEstanteId}`;
+                document.getElementById(EstanteformId).submit();
+            }
+        }
+    </script>
+
+    <script>
+        let deleteBultoId = null;
+
+        function setDeleteBultoId(bultoId) {
+            deleteBultoId = bultoId;
+        }
+
+        function confirmDeleteBulto() {
+            if (deleteBultoId !== null) {
+                const BultoformId = `delete-bulto-form-${deleteBultoId}`;
+                document.getElementById(BultoformId).submit();
+            }
+        }
+    </script>
+
+    <script>
+        let deleteAlmacenId = null;
+
+        function setDeleteAlmacenId(almacenId) {
+            deleteAlmacenId = almacenId;
+        }
+
+        function confirmDeleteAlmacen() {
+            if (deleteAlmacenId !== null) {
+                const BultoformId = `delete-almacen-form-${deleteAlmacenId}`;
+                document.getElementById(BultoformId).submit();
+            }
+        }
+    </script>
+
+    <script>
+        let deleteProductoId = null;
+
+        function setDeleteProductoId(productoId) {
+            deleteProductoId = productoId;
+        }
+
+        function confirmDeleteProducto() {
+            if (deleteProductoId !== null) {
+                const ProductoformId = `delete-producto-form-${deleteProductoId}`;
+                document.getElementById(ProductoformId).submit();
+            }
+        }
+    </script>
+
+    <script>
+        function previewImage(event) {
+            var input = event.target;
+            var preview = document.getElementById('preview');
+            var label = document.getElementById('custom-file-label');
+
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.setAttribute('src', e.target.result);
+                    preview.style.display = 'block';
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+
+
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Enfocar automáticamente el campo codigo_barras
+            $('#codigo_barras_hidden').focus();
+
+            // Detectar la pulsación de teclas en el campo codigo_barras
+            $('#codigo_barras_hidden').keyup(function (event) {
+                if (event.key === 'Enter') {
+                    // Obtener el valor del código de barras ingresado
+                    var codigoBarras = $(this).val();
+
+                    // Realizar alguna acción con el código de barras (por ejemplo, mostrarlo en la consola)
+                    console.log('Código de barras: ' + codigoBarras);
+
+                    // Limpiar el campo codigo_barras
+                    $(this).val('');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        // Cierra el mensaje después de 1 segundo
+        setTimeout(function () {
+            document.querySelector("#alert-alert").remove();
+        }, 1000); // 1000 milisegundos = 1 segundo
+    </script>
+
+<script>
+    $(document).ready(function () {
+        function realizarBusqueda() {
+            const busqueda = $('#busquedaInput').val();
+
+            if (!busqueda) {
+                alert('Ingrese un valor para buscar.');
+                return;
+            }
+
+            const url = `/buscar-producto-general/${busqueda}`;
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    if (data.error) {
+                        alert('Producto no encontrado');
+                    } else {
+                        $('#nombreProducto').text(data.nombre);
+                        $('#productoProducto').text(data.producto);
+                        $('#imagenProducto').attr('src', data.imagen_url);
+                        $('#descripcionProducto').text(data.descripcion);
+                        $('#precioProducto').text(data.precio);
+                        $('#cantidadProducto').text(data.cantidad);
+                        $('#compatibilidadProducto').text(data.compatibilidad);
+                        $('#ubicacionProducto').text(data.ubicacion);
+                        const almacenes = data.almacenes.join(', ') || 'Todavía no está ubicado en ningún almacén';
+                        const estantes = data.estantes.join(', ') || 'Todavía no está ubicado en ningún estante';
+                        $('#almacenesProducto').text(almacenes);
+                        $('#estantesProducto').text(estantes);
+                        $('#miModal').modal('show');
+                    }
+                },
+                error: function () {
+                    alert('Producto no encontrado');
+                }
+            });
+        }
+
+        $('#btnBuscar').click(function () {
+            realizarBusqueda();
+        });
+
+        $('#busquedaInput').keydown(function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); 
+                realizarBusqueda();
+            }
+        });
+    });
+</script>
+
+    <script>
+        function agregarProductoAlmacen() {
+            var product_id = document.getElementById('product_id_field').value;
+            var selectedAlmacenes = document.querySelectorAll('input[name="almacen_id"]:checked');
+            var almacenes = [];
+            selectedAlmacenes.forEach(function(almacen) {
+                almacenes.push(almacen.value);
+            });
+            
+            // Enviar datos al servidor mediante una solicitud AJAX
+            fetch('/agregar_a_almacen', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    product_id: product_id,
+                    almacen_id: almacenes
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // La solicitud fue exitosa, puedes manejar la respuesta aquí si es necesario
+                    console.log('Producto agregado correctamente a los almacenes seleccionados.');
+                } else {
+                    // La solicitud falló, maneja el error aquí si es necesario
+                    console.error('Error al agregar producto a los almacenes:', response.statusText);
+                }
+            })
+            .catch(error => {
+                // Error en la solicitud, maneja el error aquí si es necesario
+                console.error('Error al procesar la solicitud:', error);
+            });
+        }
+    </script> 
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById("search-input-index");
+            const searchButton = document.getElementById("search-button-index");
+
+            // Escuchar el evento 'click' en el botón de búsqueda
+            searchButton.addEventListener("click", function() {
+                const valor = searchInput.value.trim();
+                filtrarProductos(valor);
+            });
+
+            // Escuchar el evento 'keydown' en el input de búsqueda
+            searchInput.addEventListener("keydown", function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Prevenir el comportamiento predeterminado del Enter
+                    const valor = searchInput.value.trim();
+                    filtrarProductos(valor);
+            }
+            });
+
+            function filtrarProductos(valor) {
+                // Realizar una solicitud GET a la vista de Django
+                const url = `/search_productos/${encodeURIComponent(valor)}`;
+                window.location.href = url;
+            }
+        });
+    </script>
+
+
+    <!-- JavaScript para búsqueda de productos y estantes -->
+    <script>
+        // Búsqueda de productos
+        document.getElementById("searchProductAlmacen").addEventListener("input", function() {
+        var input, filter, ul, li, label, i, txtValue;
+        input = document.getElementById("searchProductAlmacen");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("productsList");
+        li = ul.getElementsByTagName("div");
+        for (i = 0; i < li.length; i++) {
+            label = li[i].getElementsByTagName("label")[0];
+            txtValue = label.textContent || label.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+            } else {
+             li[i].style.display = "none";
+            }
+        }
+        });
+  
+        // Búsqueda de estantes
+        document.getElementById("searchShelf").addEventListener("input", function() {
+        var input, filter, ul, li, label, i, txtValue;
+        input = document.getElementById("searchShelf");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("shelvesList");
+        li = ul.getElementsByTagName("div");
+        for (i = 0; i < li.length; i++) {
+            label = li[i].getElementsByTagName("label")[0];
+            txtValue = label.textContent || label.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+            } else {
+            li[i].style.display = "none";
+            }
+        }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('userForm');
+            const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+            const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+
+            form.addEventListener('submit', function (event) {
+                const passwordValue = password1.value;
+                const requirements = [
+                    { regex: /.{12,}/, message: 'La contraseña debe tener al menos 12 caracteres.' },
+                    { regex: /[A-Z]/, message: 'La contraseña debe contener al menos una letra mayúscula.' },
+                    { regex: /[a-z]/, message: 'La contraseña debe contener al menos una letra minúscula.' },
+                    { regex: /[0-9]/, message: 'La contraseña debe contener al menos un número.' },
+                    { regex: /[!@#$%^&*(),.?":{}|<>]/, message: 'La contraseña debe contener al menos un carácter especial.' }
+                ];
+
+                for (const requirement of requirements) {
+                    if (!requirement.regex.test(passwordValue)) {
+                        alert(requirement.message);
+                        event.preventDefault();
+                        return;
+                    }
+                }
+
+                if (password1.value !== password2.value) {
+                    alert('Las contraseñas no coinciden.');
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,67 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Rodamientos</h6>
+        
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Número de artículo</th>
+                        <th>Producto</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for rodamientos in rodamientos %}
+                    <tr>
+                        <td style="width: 100px">
+                            {% if rodamientos.imagen %}
+                              <img src="{{ rodamientos.imagen.url }}" alt="{{ rodamientos.descripcion }}" style="max-width: 100%; height: auto; display: block;">
+                            {% else %}
+                              <img src="{% static 'img/tmp_img.png' %}" alt="Imagen por defecto" style="max-width: 100%; height: auto; display: block;">
+                            {% endif %}
+                          </td>
+                        <td>{{rodamientos.codigo}}</td>
+                        <td>{{rodamientos.nombre}}</td>
+                        <td>{{rodamientos.descripcion |truncatewords:1}}</td>
+                        <td>{{rodamientos.precio}}</td>
+                        <td>{{rodamientos.cantidad}}</td>
+                        <td width="200px">
+                            <form action="{% url 'almacen_app:delete_producto' product_id=rodamientos.id %}" method="POST" id="delete-producto-form-{{ rodamientos.id }}">
+                                {% csrf_token %}
+                                    
+                                {% if user.is_superuser or user.rol == 'almacenero' %}
+                                    <a class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="right"
+                                    title="Editar Producto" href={% url 'almacen_app:edit_producto' product_id=rodamientos.id %}><i class="fa fa-edit" ></i></a> 
+    
+                                    <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteProductoModal" onclick="setDeleteProductoId({{ rodamientos.id }})">
+                                        <i class="fa fa-trash-alt"></i>
+                                    </a>
+                                    {% endif %}
+
+                                    <a class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="right"
+                                    title="Detalles" href="{% url 'almacen_app:detalle_producto' producto_id=rodamientos.id %}"><i class="fa fa-eye" ></i></a>
+                                    
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %} 
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
